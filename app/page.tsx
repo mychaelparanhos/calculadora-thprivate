@@ -82,13 +82,7 @@ export default function Page() {
                 Mínimo por cota no {lote.nome}: {brl(lote.cota)}.
               </p>
             </div>
-            <div>
-              <label className="text-white block mb-2">Observações (opcional)</label>
-              <textarea
-                className="w-full bg-gray-950 border border-gray-700 text-white rounded-xl px-3 py-2 placeholder:text-gray-500"
-                placeholder="Ex.: desejo reaplicar rendimentos, interesse em ticket maior, etc."
-              />
-            </div>
+
           </div>
           {/* Resumo */}
           <div className="md:col-span-3 bg-gray-900 border border-gray-700 rounded-2xl shadow-lg p-6 space-y-5">
