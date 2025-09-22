@@ -50,12 +50,9 @@
 }
 
 @layer base {
-  /*
-   * Apply the background and text colors defined via CSS variables to the
-   * body. We no longer apply a border color on every element because
-   * that class causes a Tailwind compilation error when a custom
-   * `border-border` utility is not present.
-   */
+  * {
+    @apply border-border;
+  }
   body {
     @apply bg-background text-foreground;
   }
