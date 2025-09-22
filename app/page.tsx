@@ -11,7 +11,7 @@ const LOTES = [
   { id: 6, nome: 'Lote 6', cota: 1500000, prazo: 24, taxaMes: 0.026 },
 ] as const;
 
-type Modo = 'mensal' | 'bullet';
+type Modo = 'mensal';
 
 // Format number as BRL currency
 const brl = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n || 0);
@@ -20,7 +20,7 @@ const pct = (n: number) => `${(n * 100).toFixed(2)}%`;
 export default function Page() {
   const [loteId, setLoteId] = useState('3');
   const [valor, setValor] = useState('');
-  const [modo, setModo] = useState<Modo>('mensal');
+  const modo: Modo = 'mensal';
 
   const lote = LOTES.find(l => String(l.id) === loteId)!;
   // Remove non-numeric characters before converting to number
@@ -32,15 +32,12 @@ export default function Page() {
     const principal = cotas * lote.cota;
     const n = lote.prazo;
     const i = lote.taxaMes;
-    if (modo === 'mensal') {
-      const rendimentoMensal = principal * i;
-      const totalRend = rendimentoMensal * n;
-      return { principal, rendimentoMensal, totalRend, valorFinal: principal + totalRend };
-    }
-    const valorFinal = principal * Math.pow(1 + i, n);
-    const totalRend = valorFinal - principal;
-    return { principal, rendimentoMensal: totalRend / n, totalRend, valorFinal };
-  }, [cotas, lote, modo]);
+    
+    // Apenas rendimento mensal simples (sem juros compostos)
+    const rendimentoMensal = principal * i;
+    const totalRend = rendimentoMensal * n;
+    return { principal, rendimentoMensal, totalRend, valorFinal: principal + totalRend };
+  }, [cotas, lote]);
 
   return (
     <div className="min-h-screen w-full bg-black text-gray-100 py-10">
@@ -85,22 +82,6 @@ export default function Page() {
                 Mínimo por cota no {lote.nome}: {brl(lote.cota)}.
               </p>
             </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-white block">Modalidade de recebimento</span>
-                <p className="text-xs text-gray-400">Mensal ou total no final (bullet)</p>
-              </div>
-              <div className="flex items-center gap-4">
-                <label className={`text-xs cursor-pointer ${modo === 'mensal' ? 'text-white' : 'text-gray-500'}`}>
-                  <input type="radio" className="mr-2" checked={modo === 'mensal'} onChange={() => setModo('mensal')} />
-                  Mensal
-                </label>
-                <label className={`text-xs cursor-pointer ${modo === 'bullet' ? 'text-white' : 'text-gray-500'}`}>
-                  <input type="radio" className="mr-2" checked={modo === 'bullet'} onChange={() => setModo('bullet')} />
-                  No Final
-                </label>
-              </div>
-            </div>
             <div>
               <label className="text-white block mb-2">Observações (opcional)</label>
               <textarea
@@ -120,7 +101,8 @@ export default function Page() {
                   <Item k="Lote selecionado" v={`${lote.nome} | Cota ${brl(lote.cota)} | Prazo ${lote.prazo} meses | ${pct(lote.taxaMes)}/mês`} />
                   <Item k="Cotas consideradas" v={`${cotas} ${cotas === 1 ? 'cota' : 'cotas'}`} />
                   <Item k="Valor aportado" v={brl(res.principal)} />
-                  <Item k={modo === 'mensal' ? 'Rendimento mensal' : 'Média mensal (ref.)'} v={brl(res.rendimentoMensal)} />
+                  <Item k="Modalidade" v="Recebimento Mensal" />
+                  <Item k="Rendimento mensal" v={brl(res.rendimentoMensal)} />
                 </div>
                 <div className="bg-gray-950 border border-gray-700 rounded-2xl p-4 space-y-2">
                   <Item k="Rendimento total" v={brl(res.totalRend)} />
